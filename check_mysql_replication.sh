@@ -75,8 +75,13 @@ then
     exit $STATE_CRITICAL
 fi
 
-iSlave_1_position=`grep bin $slave_status_file | cut -f7`
+#Replace Read_Master_Log_Pos By  Exec_Master_Log_Pos for comparaison purpose
+#iSlave_1_position=`grep bin $slave_status_file | cut -f7`
+iSlave_1_position=`grep bin $slave_status_file | cut -f22`
 iSlave_1_status=`grep bin $slave_status_file | cut -f1`
+iSlave_1_Slave_IO_Running=`grep bin $slave_status_file | cut -f11`
+iSlave_1_Slave_SQL_Running=`grep bin $slave_status_file | cut -f12`
+iSlave_1_Last_Errno=`grep bin $slave_status_file | cut -f19`
 rm -f $slave_status_file
 
 iMaster_position=`grep bin $master_status_file | cut -f2`
@@ -86,12 +91,20 @@ iDiff_1=`expr $iMaster_position - $iSlave_1_position`
 
 if [ $iDiff_1 -gt $REPL_DIFFERENCE ]
 then
-    echo "CRITICAL - master log $iMaster - slave log $iSlave_1 - log positions differ by more than $CRITICAL_VALUE"
+    echo "CRITICAL - master log $iMaster - slave log $iSlave_1 - log positions differ by more than $REPL_DIFFERENCE"
     exit $STATE_CRITICAL
 elif [ "$iSlave_1_status" != "Waiting for master to send event" ]
 then
     echo "CRITICAL - slave status is '$iSlave_1_status'"
     exit $STATE_CRITICAL
+#NEW CHECK
+elif [[ "$iSlave_1_Slave_IO_Running" != "Yes" || "$iSlave_1_Slave_SQL_Running" != "Yes" || "$iSlave_1_Last_Errno" != "0" ]]
+#elif  [ "$iSlave_1_Slave_IO_Running" != "Yes" ] || [ "$iSlave_1_Slave_SQL_Running" != "Yes" ] || [ "$iSlave_1_Last_Errno" != "0" ] 
+then
+echo "CRITICAL - slave '$SLAVEHOST' IO/SQL RUNNING / Last_Errno: is not at 0 : IO RUNNING->'$iSlave_1_Slave_IO_Running' / SQL RUNNING->'$iSlave_1_Slave_SQL_Running' / Last_Errno->'$iSlave_1_Last_Errno'"
+    rm_ifexist
+    exit $STATE_CRITICAL
+#END NEW CHECK
 else
     echo "OK - log positions match ($iMaster_position = $iSlave_1_position), slave status = '$iSlave_1_status'"
     exit $STATE_OK
