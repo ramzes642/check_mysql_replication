@@ -107,7 +107,6 @@ then
     exit $STATE_CRITICAL
 #NEW CHECK
 elif [[ "$iSlave_1_Slave_IO_Running" != "Yes" || "$iSlave_1_Slave_SQL_Running" != "Yes" || "$iSlave_1_Last_Errno" != "0" ]]
-#elif  [ "$iSlave_1_Slave_IO_Running" != "Yes" ] || [ "$iSlave_1_Slave_SQL_Running" != "Yes" ] || [ "$iSlave_1_Last_Errno" != "0" ] 
 then
 echo "CRITICAL - slave '$SLAVEHOST' IO/SQL RUNNING / Last_Errno: is not at 0 : IO RUNNING->'$iSlave_1_Slave_IO_Running' / SQL RUNNING->'$iSlave_1_Slave_SQL_Running' / Last_Errno->'$iSlave_1_Last_Errno'"
     rm_ifexist
