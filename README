@@ -8,3 +8,10 @@ Script assumes:
  * English locale
 
 More info at http://blog.endpoint.com/2012/01/mysql-replication-monitoring-on-ubuntu.html
+
+Modified To retun Critical in case of Slave :
+- Last Errno not 0
+- IO Running: no
+- SQL running: no
+
+The argument for slave in the difference operation has been change from "Read_Master_Log_Pos" to "Exec_Master_Log_Pos"
